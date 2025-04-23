@@ -21,8 +21,8 @@ function resetDisplay(){
 
 
 function init(){
-  ON_COLOR = api.getBlockId("Black Concrete")
-  OFF_COLOR = api.getBlockId("White Concrete")
+  ON_COLOR = 1
+  OFF_COLOR = 0
   ram = []
   for(let i = 0; i < 4096; i++){
     ram.push(0x0000)
@@ -103,7 +103,7 @@ function interpret(line){
         N = N.toString(2)
         for(let k = 0; k < N; k++){
           if(N[k] == 1){
-            if(display[x][y] = ON_COLOR){
+            if(display[x][y] == ON_COLOR){
               display[x][y] = OFF_COLOR
               VF = 1
             } else {
@@ -122,30 +122,46 @@ function interpret(line){
     case 0xF:
       break
     
+    }
 }
 
 function displ(){
   coord = [-32,32,0]
   for(let i = 0; i < display.length; i++){
-    coord[0] = -32
+    coord[1] = 32
     j = ""
     for(let k = 0; k < display[0].length; k++){
-      if(display[i][k] == ON_COLOR){
+      if(display[i][k] == OFF_COLOR){
         j += "*"
       } else {
         j += " "
       }
-      coord[0]++
+      coord[1]--
     }
     console.log(j)
-    coord[1] --
+    coord[0] ++
   }
 }
+
+const data = [
+	0x00E0, 0xA22A, 0x600C, 0x6108, 0xD01F, 0x7009,
+	0xA239, 0xD01F, 0xA248, 0x7008, 0xD01F, 0x7004,
+	0xA257, 0xD01F, 0x7008, 0xA266, 0xD01F, 0x7008,
+	0xA275, 0xD01F, 0x1228, 0xFF00, 0xFF00, 0x3C00,
+	0x3C00, 0x3C00, 0x3C00, 0xFF00, 0xFFFF, 0x00FF,
+	0x0038, 0x003F, 0x003F, 0x0038, 0x00FF, 0x00FF,
+	0x8000, 0xE000, 0xE000, 0x8000, 0x8000, 0xE000,
+	0xE000, 0x80F8, 0x00FC, 0x003E, 0x003F, 0x003B,
+	0x0039, 0x00F8, 0x00F8, 0x0300, 0x0700, 0x0F00,
+	0xBF00, 0xFB00, 0xF300, 0xE300, 0x43E0, 0x00E0,
+	0x0080, 0x0080, 0x0080, 0x0080, 0x00E0, 0x00E0
+]
+
 init()
-TICK_TICK = 0
-while(PC < rom.length){
+displ()
+while(PC < data.length){
   interpret(rom[i])
-  TICK_TICK ++
+  PC++
   if(TICK_TICK % 10 == 0){
     displ()
   }
