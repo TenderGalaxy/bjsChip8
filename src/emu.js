@@ -1,7 +1,17 @@
+/* GOALS */
+/* Write IBM Logo
+00E0
+1NNN
+6XNN
+7XNN
+ANNN
+DXYN
+*/
+
 function resetDisplay(){
   let tmp = []
   for(let i = 0; i < 32; i++){
-    tmp.push(0)
+    tmp.push(OFF_COLOR)
   }
   display = []
   for(let i = 0; i < 64; i++){
@@ -11,14 +21,21 @@ function resetDisplay(){
 
 
 function init(){
+  ON_COLOR = api.getBlockId("Black Concrete")
+  OFF_COLOR = api.getBlockId("White Concrete")
   ram = []
   for(let i = 0; i < 4096; i++){
     ram.push(0x0000)
   }
+  regs = []
+  for(let i = 0; i < 16; i++){
+    regs.push(0)
+  }
   stack = []
   DT = 0
   ST = 0
-  I = 0
+  IDX = 0
+  VF = 0
   PC = 0x200
   SP = stack[stack.length - 1]
   resetDisplay()
@@ -44,5 +61,92 @@ function interpret(line){
     case 0:
       scw0(args)
       break
+    case 1:
+      PC = (256 * args[1] + 16 * args[2] + args[3])
+      break
+    case 2:
+      break
+    case 3:
+      break
+    case 4:
+      break
+    case 5:
+      break
+    case 6:
+      regs[args[1]] = (16 * args[2] + args[3])
+      break
+    case 7:
+      regs[args[1]] += (16 * args[2] + args[3])
+      break
+    case 8:
+      break
+    case 9:
+      break
+    case 0xA:
+      IDX = (256 * args[1] + 16 * args[2] + args[3])
+      break
+    case 0xB:
+      break
+    case 0xC:
+      break
+    case 0xD:
+      /* AHHHH DXYN IS HARD */
+      y = regs[args[1] & 31]
+      VF = 0
+      for(let i = 0; i < args[2]; i++){
+        if(y > 31){
+          break
+        }
+        x = regs[args[1] & 63]
+        N = ram[I]
+        I++
+        N = N.toString(2)
+        for(let k = 0; k < N; k++){
+          if(N[k] == 1){
+            if(display[x][y] = ON_COLOR){
+              display[x][y] = OFF_COLOR
+              VF = 1
+            } else {
+              display[x][y] = ON_COLOR
+            }
+          }
+          if(x < 63){
+            x++
+          }
+        }
+        y++
+      }
+      break
+    case 0xE:
+      break
+    case 0xF:
+      break
     
+}
+
+function displ(){
+  coord = [-32,32,0]
+  for(let i = 0; i < display.length; i++){
+    coord[0] = -32
+    j = ""
+    for(let k = 0; k < display[0].length; k++){
+      if(display[i][k] == ON_COLOR){
+        j += "*"
+      } else {
+        j += " "
+      }
+      coord[0]++
+    }
+    console.log(j)
+    coord[1] --
+  }
+}
+init()
+TICK_TICK = 0
+while(PC < rom.length){
+  interpret(rom[i])
+  TICK_TICK ++
+  if(TICK_TICK % 10 == 0){
+    displ()
+  }
 }
