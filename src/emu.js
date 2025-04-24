@@ -34,17 +34,20 @@ function init(){
   stack = []
   DT = 0
   ST = 0
-  IDX = 0
   VF = 0
   PC = 0x200
   SP = stack[stack.length - 1]
+  I = 0x200
   resetDisplay()
 }
 
 function swc0(args){
-  switch(args[3]){
-    case 0xE:
+  switch(args[2]){
+    case 14:
+      console.log("DISPLAY RESET")
       resetDisplay()
+      break
+    default:
       break
   }
 }
@@ -53,16 +56,21 @@ function interpret(line){
   args = []
   for(let i = 0; i < 4; i++){
     args.push(line % 16)
-    line >> 4
+    line = Math.floor(line/16)
   }
   args.reverse()
+  N = args[3]
+  NN = 16 * args[2] + args[3]
+  NNN = 256 * args[1] + 16 * args[2] + args[3]
+  X = args[1]
+  Y = args[2]
 
   switch (args[0]){
     case 0:
-      scw0(args)
+      swc0(args)
       break
     case 1:
-      PC = (256 * args[1] + 16 * args[2] + args[3])
+      PC = NNN - 1
       break
     case 2:
       break
@@ -73,17 +81,17 @@ function interpret(line){
     case 5:
       break
     case 6:
-      regs[args[1]] = (16 * args[2] + args[3])
+      regs[X] = NN
       break
     case 7:
-      regs[args[1]] += (16 * args[2] + args[3])
+      regs[X] += NN
       break
     case 8:
       break
     case 9:
       break
     case 0xA:
-      IDX = (256 * args[1] + 16 * args[2] + args[3])
+      I = NNN
       break
     case 0xB:
       break
@@ -91,21 +99,22 @@ function interpret(line){
       break
     case 0xD:
       /* AHHHH DXYN IS HARD */
-      y = regs[args[1] & 31]
-      VF = 0
+      y = regs[Y] & 31
+      regs[0xF]  = 0
+      idx = I
       for(let i = 0; i < args[2]; i++){
         if(y > 31){
           break
         }
-        x = regs[args[1] & 63]
-        N = ram[I]
-        I++
+        x = regs[X] & 63
+        N = ram[idx]
+        idx++
         N = N.toString(2)
         for(let k = 0; k < N; k++){
           if(N[k] == 1){
             if(display[x][y] == ON_COLOR){
               display[x][y] = OFF_COLOR
-              VF = 1
+              regs[0xF] = 1
             } else {
               display[x][y] = ON_COLOR
             }
@@ -126,6 +135,7 @@ function interpret(line){
 }
 
 function displ(){
+    /*
   coord = [-32,32,0]
   for(let i = 0; i < display.length; i++){
     coord[1] = 32
@@ -141,9 +151,10 @@ function displ(){
     console.log(j)
     coord[0] ++
   }
+  */
 }
 
-const rom = [
+rom = [
 	0x00E0, 0xA22A, 0x600C, 0x6108, 0xD01F, 0x7009,
 	0xA239, 0xD01F, 0xA248, 0x7008, 0xD01F, 0x7004,
 	0xA257, 0xD01F, 0x7008, 0xA266, 0xD01F, 0x7008,
@@ -159,8 +170,8 @@ const rom = [
 
 init()
 displ()
-while(PC < data.length + 0x200){
-  interpret(rom[PC] - 0x200)
+while(PC < rom.length + 0x200){
+  interpret(rom[PC - 0x200])
   PC++
   if(PC % 10 == 0){
     displ()
