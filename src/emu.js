@@ -143,7 +143,7 @@ function displ(){
   }
 }
 
-const data = [
+const rom = [
 	0x00E0, 0xA22A, 0x600C, 0x6108, 0xD01F, 0x7009,
 	0xA239, 0xD01F, 0xA248, 0x7008, 0xD01F, 0x7004,
 	0xA257, 0xD01F, 0x7008, 0xA266, 0xD01F, 0x7008,
@@ -159,10 +159,10 @@ const data = [
 
 init()
 displ()
-while(PC < data.length){
-  interpret(rom[i])
+while(PC < data.length + 0x200){
+  interpret(rom[PC] - 0x200)
   PC++
-  if(TICK_TICK % 10 == 0){
+  if(PC % 10 == 0){
     displ()
   }
 }
