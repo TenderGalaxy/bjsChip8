@@ -20,8 +20,8 @@ function resetDisplay(){
 
 
 function init(){
-  ON_COLOR =  "@"
-  OFF_COLOR = " "
+  ON_COLOR =  "Black Concrete"
+  OFF_COLOR = "White Concrete"
   ram = []
   for(let i = 0; i < 4096; i++){
     ram.push(0x0000)
@@ -29,18 +29,6 @@ function init(){
   for(let i = 0; i < rom.length; i++){
     ram[0x200 + i] = rom[i]
   }
-  regs = []
-  for(let i = 0; i < 16; i++){
-    regs.push(0)
-  }
-  stack = []
-  DT = 0
-  ST = 0
-  VF = 0
-  PC = 0x200
-  SP = stack[stack.length - 1]
-  I = 0x200
-  resetDisplay()
 }
 
 function swc0(args){
@@ -52,6 +40,21 @@ function swc0(args){
     default:
       break
   }
+}
+
+function init2(){
+	regs = []
+  for(let i = 0; i < 16; i++){
+    regs.push(0)
+  }
+  stack = []
+  DT = 0
+  ST = 0
+  VF = 0
+  PC = 0x200
+  SP = stack[stack.length - 1]
+  I = 0x200
+  resetDisplay()
 }
 
 function interpret(line){
@@ -158,7 +161,7 @@ function displ(){
       if(display[k][i] == ON_COLOR){
         api.setBlock(coord, ON_COLOR)
       } else {
-        api.setBlock(coord, OFF_COLOR
+        api.setBlock(coord, OFF_COLOR)
       }
       coord[1]--
     }
@@ -183,13 +186,16 @@ const rom = [
 
 
 function tick(){
-  if(flag == -1){
-    flag == 1
+	try{flag} catch {
+		flag == "INIT2"
     curr_tick = 0
     comm = 1
     init()
-  }
-  if(flag == 1){
+	}
+	if(flag == "INIT2"){
+		init2()
+	}
+  if(flag == "RUNNING"){
     comm = ram[PC]
     PC++
     comm = 256 * comm + ram[PC]
@@ -197,7 +203,7 @@ function tick(){
     interpret(comm)
     curr_tick++
     if(comm == 0){
-      flag = 0
+      flag = "OFF"
     }
   }
 }
