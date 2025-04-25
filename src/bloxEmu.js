@@ -1,4 +1,4 @@
-/* GOALS */
+/* GOALS   */
 /* Write IBM Logo
 00E0
 1NNN
@@ -26,9 +26,6 @@ function init(){
   for(let i = 0; i < 4096; i++){
     ram.push(0x0000)
   }
-  for(let i = 0; i < rom.length; i++){
-    ram[0x200 + i] = rom[i]
-  }
 }
 
 function swc0(args){
@@ -43,6 +40,9 @@ function swc0(args){
 }
 
 function init2(){
+  for(let i = 0; i < rom.length; i++){
+    ram[0x200 + i] = rom[i]
+  }
 	regs = []
   for(let i = 0; i < 16; i++){
     regs.push(0)
@@ -55,6 +55,11 @@ function init2(){
   SP = stack[stack.length - 1]
   I = 0x200
   resetDisplay()
+}
+function init3(){
+	for(let i = -4; i < 4; i++){
+		api.setBlockRect([i*8,32,0],[i*8+8,0,0],"White Concrete")
+	}
 }
 
 function interpret(line){
@@ -137,12 +142,12 @@ function interpret(line){
             } else {
               display[x][y] = ON_COLOR
             }
+			api.setBlock([-32 + x, 32 - y, 0], display[x][y])
           }
         }
         y++
         
       }
-      displ()
       break
     case 0xE:
       break
@@ -156,16 +161,16 @@ function displ(){
     
   coord = [-32,32,0]
   for(let i = 0; i < display[0].length; i++){
-    coord[1] = 32
+    coord[0] = -32
     for(let k = 0; k < display.length; k++){
       if(display[k][i] == ON_COLOR){
         api.setBlock(coord, ON_COLOR)
       } else {
         api.setBlock(coord, OFF_COLOR)
       }
-      coord[1]--
+      coord[0]++
     }
-    coord[0] ++
+    coord[1]--
   }
   
 }
@@ -187,23 +192,32 @@ const rom = [
 
 function tick(){
 	try{flag} catch {
-		flag == "INIT2"
+		flag = "INIT2"
     curr_tick = 0
     comm = 1
     init()
 	}
 	if(flag == "INIT2"){
 		init2()
+		flag = "INIT3"
+	}
+	if(flag == "INIT3"){
+		init3()
+		flag = "RUNNING"
 	}
   if(flag == "RUNNING"){
     comm = ram[PC]
     PC++
     comm = 256 * comm + ram[PC]
     PC++
+	console.log(comm)
     interpret(comm)
     curr_tick++
     if(comm == 0){
       flag = "OFF"
+    }
+  }
+}
     }
   }
 }
