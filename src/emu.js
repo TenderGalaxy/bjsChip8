@@ -9,23 +9,25 @@ DXYN
 */
 
 function resetDisplay(){
-  let tmp = []
-  for(let i = 0; i < 32; i++){
-    tmp.push(OFF_COLOR)
-  }
   display = []
   for(let i = 0; i < 64; i++){
-    display.push(tmp)
+    display[i]  = []
+    for(let k = 0; k < 32; k++){
+        display[i].push(OFF_COLOR)
+    }
   }
 }
 
 
 function init(){
-  ON_COLOR = 1
-  OFF_COLOR = 0
+  ON_COLOR =  "@"
+  OFF_COLOR = " "
   ram = []
   for(let i = 0; i < 4096; i++){
     ram.push(0x0000)
+  }
+  for(let i = 0; i < rom.length; i++){
+    ram[0x200 + i] = rom[i]
   }
   regs = []
   for(let i = 0; i < 16; i++){
@@ -44,7 +46,7 @@ function init(){
 function swc0(args){
   switch(args[2]){
     case 14:
-      console.log("DISPLAY RESET")
+      console.log(`Display Reset`)
       resetDisplay()
       break
     default:
@@ -53,6 +55,7 @@ function swc0(args){
 }
 
 function interpret(line){
+  console.log(`${line.toString(16)} at ${curr_tick}`)
   args = []
   for(let i = 0; i < 4; i++){
     args.push(line % 16)
@@ -70,6 +73,7 @@ function interpret(line){
       swc0(args)
       break
     case 1:
+      console.log(`JUMP TO: ${NNN}`)
       PC = NNN - 1
       break
     case 2:
@@ -81,9 +85,11 @@ function interpret(line){
     case 5:
       break
     case 6:
+      console.log(`Register ${X} set to ${NN}`)
       regs[X] = NN
       break
     case 7:
+      console.log(`Add ${NN} to Register ${X} (Currently ${regs[X]})`)
       regs[X] += NN
       break
     case 8:
@@ -92,6 +98,7 @@ function interpret(line){
       break
     case 0xA:
       I = NNN
+      console.log(`Index set to ${NNN.toString(16)} (${ram[NNN].toString(16)})`)
       break
     case 0xB:
       break
@@ -99,19 +106,28 @@ function interpret(line){
       break
     case 0xD:
       /* AHHHH DXYN IS HARD */
+      console.log(`X ${regs[X] & 63}, Y ${regs[Y] & 31}, Height ${N}`)
       y = regs[Y] & 31
       regs[0xF]  = 0
       idx = I
-      for(let i = 0; i < args[2]; i++){
+      for(let i = 0; i < N; i++){
         if(y > 31){
           break
         }
         x = regs[X] & 63
-        N = ram[idx]
+        draw = ram[idx].toString(2)
+        while(draw.length < 8){
+          draw = "0" + draw
+        }
         idx++
-        N = N.toString(2)
-        for(let k = 0; k < N; k++){
-          if(N[k] == 1){
+        console.log(draw)
+        
+        for(let k = 0; k < draw.length; k++){
+          x++
+          if(x > 63){
+            break
+          }
+          if(draw[k] == 1){
             if(display[x][y] == ON_COLOR){
               display[x][y] = OFF_COLOR
               regs[0xF] = 1
@@ -119,12 +135,11 @@ function interpret(line){
               display[x][y] = ON_COLOR
             }
           }
-          if(x < 63){
-            x++
-          }
         }
         y++
+        
       }
+      displ()
       break
     case 0xE:
       break
@@ -135,45 +150,43 @@ function interpret(line){
 }
 
 function displ(){
-    /*
+    
   coord = [-32,32,0]
-  for(let i = 0; i < display.length; i++){
+  for(let i = 0; i < display[0].length; i++){
     coord[1] = 32
     j = ""
-    for(let k = 0; k < display[0].length; k++){
-      if(display[i][k] == OFF_COLOR){
-        j += "*"
-      } else {
-        j += " "
-      }
+    for(let k = 0; k < display.length; k++){
+      j += display[k][i]
       coord[1]--
     }
     console.log(j)
     coord[0] ++
   }
-  */
+  
 }
 
-rom = [
-	0x00E0, 0xA22A, 0x600C, 0x6108, 0xD01F, 0x7009,
-	0xA239, 0xD01F, 0xA248, 0x7008, 0xD01F, 0x7004,
-	0xA257, 0xD01F, 0x7008, 0xA266, 0xD01F, 0x7008,
-	0xA275, 0xD01F, 0x1228, 0xFF00, 0xFF00, 0x3C00,
-	0x3C00, 0x3C00, 0x3C00, 0xFF00, 0xFFFF, 0x00FF,
-	0x0038, 0x003F, 0x003F, 0x0038, 0x00FF, 0x00FF,
-	0x8000, 0xE000, 0xE000, 0x8000, 0x8000, 0xE000,
-	0xE000, 0x80F8, 0x00FC, 0x003E, 0x003F, 0x003B,
-	0x0039, 0x00F8, 0x00F8, 0x0300, 0x0700, 0x0F00,
-	0xBF00, 0xFB00, 0xF300, 0xE300, 0x43E0, 0x00E0,
-	0x0080, 0x0080, 0x0080, 0x0080, 0x00E0, 0x00E0
-]
+const rom = [
+	0x00, 0xE0, 0xA2, 0x2A, 0x60, 0x0C, 0x61, 0x08, 0xD0, 0x1F, 0x70, 0x09,
+	0xA2, 0x39, 0xD0, 0x1F, 0xA2, 0x48, 0x70, 0x08, 0xD0, 0x1F, 0x70, 0x04,
+	0xA2, 0x57, 0xD0, 0x1F, 0x70, 0x08, 0xA2, 0x66, 0xD0, 0x1F, 0x70, 0x08,
+	0xA2, 0x75, 0xD0, 0x1F, 0x12, 0x28, 0xFF, 0x00, 0xFF, 0x00, 0x3C, 0x00,
+	0x3C, 0x00, 0x3C, 0x00, 0x3C, 0x00, 0xFF, 0x00, 0xFF, 0xFF, 0x00, 0xFF,
+	0x00, 0x38, 0x00, 0x3F, 0x00, 0x3F, 0x00, 0x38, 0x00, 0xFF, 0x00, 0xFF,
+	0x80, 0x00, 0xE0, 0x00, 0xE0, 0x00, 0x80, 0x00, 0x80, 0x00, 0xE0, 0x00,
+	0xE0, 0x00, 0x80, 0xF8, 0x00, 0xFC, 0x00, 0x3E, 0x00, 0x3F, 0x00, 0x3B,
+	0x00, 0x39, 0x00, 0xF8, 0x00, 0xF8, 0x03, 0x00, 0x07, 0x00, 0x0F, 0x00,
+	0xBF, 0x00, 0xFB, 0x00, 0xF3, 0x00, 0xE3, 0x00, 0x43, 0xE0, 0x00, 0xE0,
+	0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0xE0, 0x00, 0xE0
+];
 
+curr_tick = 0
+comm = 1
 init()
-displ()
-while(PC < rom.length + 0x200){
-  interpret(rom[PC - 0x200])
+while(comm != 0){
+  comm = ram[PC]
   PC++
-  if(PC % 10 == 0){
-    displ()
-  }
+  comm = 256 * comm + ram[PC]
+  PC++
+  interpret(comm)
+  curr_tick++
 }
