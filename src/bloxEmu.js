@@ -87,10 +87,19 @@ function interpret(line){
     case 2:
       break
     case 3:
+		  if(regs[X] == NN){
+				PC += 2
+			}
       break
     case 4:
+			if(regs[X] != NN){
+				PC += 2
+			}
       break
     case 5:
+			if(regs[X] == regs[Y]){
+				PC += 2
+			}
       break
     case 6:
       api.log(`Register ${X} set to ${NN}`)
@@ -103,6 +112,9 @@ function interpret(line){
     case 8:
       break
     case 9:
+			if(regs[X] != regs[Y]){
+				PC += 2
+			}
       break
     case 0xA:
       I = NNN
