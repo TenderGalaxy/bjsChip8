@@ -128,7 +128,6 @@ function interpret(line){
           draw = "0" + draw
         }
         idx++
-        api.log(draw)
         
         for(let k = 0; k < draw.length; k++){
           x++
@@ -192,20 +191,12 @@ const rom = [
 
 function tick(){
 	try{flag} catch {
-		flag = "INIT2"
+		flag = "ON"
     curr_tick = 0
     comm = 1
     init()
 	}
-	if(flag == "INIT2"){
-		init2()
-		flag = "INIT3"
-	}
-	if(flag == "INIT3"){
-		init3()
-		flag = "RUNNING"
-	}
-  if(flag == "RUNNING"){
+	if(flag == "RUNNING"){
     comm = ram[PC]
     PC++
     comm = 256 * comm + ram[PC]
@@ -216,8 +207,16 @@ function tick(){
     if(comm == 0){
       flag = "OFF"
     }
-  }
-}
-    }
-  }
+  	}
+	if(flag == "INIT3"){
+		init3()
+		flag = "RUNNING"
+	}
+	if(flag == "INIT2"){
+		init2()
+		flag = "INIT3"
+	}
+	if(flag == "ON"){
+		flag = "INIT2"
+	}
 }
