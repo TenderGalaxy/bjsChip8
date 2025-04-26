@@ -1,11 +1,20 @@
 /* GOALS   */
-/* Write IBM Logo
-00E0
-1NNN
-6XNN
-7XNN
-ANNN
-DXYN
+/* Support Every Command
+8XY6
+8XYE
+BNNN
+CXNN
+EX9E
+EXA1
+FX07
+FX15
+FX18
+FX13
+FX0A
+FX29
+FX33
+FX55
+FX65
 */
 function toggles(){
 	toggleShiftEmu = true // Only true for OG Chip-8 Programs (Not Chip-48 or Super Chip)
