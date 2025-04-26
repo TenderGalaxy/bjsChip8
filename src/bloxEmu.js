@@ -15,7 +15,7 @@ const rom = [
 
 toggleShiftEmu = false
 
-/* GOALS   */
+/* GOALS  */
 /* Support Every Command
 8XY6
 8XYE
@@ -33,12 +33,6 @@ FX33
 FX55
 FX65
 */
-console.log("fenl_'s Bloxd Chip-8 emulator")
-flag = "INIT"
-curr_tick = 0
-comm = 1
-comms = 0
-init()
 function resetDisplay(){
   display = []
   for(let i = 0; i < 64; i++){
@@ -133,7 +127,6 @@ function init2(){
   resetDisplay()
 }
 function init3(){
-	toggles()
 	for(let i = -4; i < 4; i++){
 		api.setBlockRect([i*8,32,0],[i*8+8,0,0],"White Concrete")
 	}
@@ -244,6 +237,14 @@ function interpret(line){
     }
 }
 function tick(){
+	try{flag}catch{
+		console.log("fenl_'s Bloxd Chip-8 emulator")
+		flag = "INIT"
+		curr_tick = 0
+		comm = 1
+		comms = 0
+		init()
+	}
 	switch (flag) {
 		case "RUNNING":
 			comm = ram[PC]
