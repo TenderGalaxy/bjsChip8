@@ -284,7 +284,7 @@ function tick(){
 			flag = "RUNNING"
 			break
 		case "INIT":
-			flag = "INIT2":
+			flag = "INIT2"
 			break
 	}
 	
