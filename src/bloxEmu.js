@@ -54,23 +54,23 @@ function swc0(args){
 function scw8(X,Y,N){
 	switch(N){
 		case 0:
-			api.log(`Set register ${X} (${regs[X]}) to register ${Y} (${regs[Y})`)
+			api.log(`Set register ${X} (${regs[X]}) to register ${Y} (${regs[Y]})`)
 			regs[X] = regs[Y]
 			break
 		case 1:
-			api.log(`Set register ${X} (${regs[X]}) to register ${Y} (${regs[Y}) Binary OR`)
+			api.log(`Set register ${X} (${regs[X]}) to register ${Y} (${regs[Y]}) Binary OR`)
 			regs[X] = regs[Y] || regs[X]
 			break
 		case 2:
-			api.log(`Set register ${X} (${regs[X]}) to register ${Y} (${regs[Y}) Binary AND`)
+			api.log(`Set register ${X} (${regs[X]}) to register ${Y} (${regs[Y]}) Binary AND`)
 			regs[X] = regs[Y] && regs[X]
 			break
 		case 3:
-			api.log(`Set register ${X} (${regs[X]}) to register ${Y} (${regs[Y}) Logical XOR`)
+			api.log(`Set register ${X} (${regs[X]}) to register ${Y} (${regs[Y]}) Logical XOR`)
 			regs[X] = regs[X] ^ regs[Y]
 			break
 		case 4:
-			api.log(`Set register ${X} (${regs[X]}) to register ${Y} (${regs[Y}) ADD`)
+			api.log(`Set register ${X} (${regs[X]}) to register ${Y} (${regs[Y]}) ADD`)
 			regs[X] = regs[Y] + regs[X]
 			regs[15] = 0 
 			if(regs[X] > 255){
@@ -79,7 +79,7 @@ function scw8(X,Y,N){
 			}
 			break
 		case 5:
-			api.log(`Set register ${X} (${regs[X]}) to register ${Y} (${regs[Y}) SubtractXY`)
+			api.log(`Set register ${X} (${regs[X]}) to register ${Y} (${regs[Y]}) SubtractXY`)
 			regs[X] = regs[X] - regs[Y]
 			regs[15] = 0
 			if(regs[X] < 0){
@@ -88,7 +88,7 @@ function scw8(X,Y,N){
 			}
 			break
 		case 7:
-			api.log(`Set register ${X} (${regs[X]}) to register ${Y} (${regs[Y}) SubtractYX`)
+			api.log(`Set register ${X} (${regs[X]}) to register ${Y} (${regs[Y]}) SubtractYX`)
 			regs[X] = regs[Y] - regs[X]
 			regs[15] = 0
 			if(regs[X] < 0){
