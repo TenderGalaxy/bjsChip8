@@ -257,33 +257,35 @@ const rom = [
 
 
 function tick(){
+	
 	try{flag} catch {
+		console.log("fenl_'s Bloxd Chip-8 emulator")
 		flag = "ON"
     curr_tick = 0
     comm = 1
     init()
 	}
-	if(flag == "RUNNING"){
-    comm = ram[PC]
-    PC++
-    comm = 256 * comm + ram[PC]
-    PC++
-	console.log(comm)
-    interpret(comm)
-    curr_tick++
-    if(comm == 0){
-      flag = "OFF"
-    }
-  	}
-	if(flag == "INIT3"){
-		init3()
-		flag = "RUNNING"
+	
+	switch (flag) {
+		case "RUNNING":
+			comm = ram[PC]
+    	PC++
+    	comm = 256 * comm + ram[PC]
+    	PC++
+			console.log(comm)
+    	interpret(comm)
+    	curr_tick++
+    	if(comm == 0){
+     	 flag = "OFF"
+    	}
+			break
+		case "INIT3":
+			init3()
+			flag = "RUNNING"
+			break
+		case "INIT":
+			flag = "INIT2":
+			break
 	}
-	if(flag == "INIT2"){
-		init2()
-		flag = "INIT3"
-	}
-	if(flag == "ON"){
-		flag = "INIT2"
-	}
+	
 }
