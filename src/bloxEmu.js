@@ -97,7 +97,7 @@ function interpret(line){
 			}
       break
     case 5:
-			if(regs[X] == regs[Y]){
+			if(regs[X] == regs[Y] & N == 0){
 				PC += 2
 			}
       break
@@ -112,7 +112,7 @@ function interpret(line){
     case 8:
       break
     case 9:
-			if(regs[X] != regs[Y]){
+			if(regs[X] != regs[Y] & N == 0){
 				PC += 2
 			}
       break
@@ -260,12 +260,12 @@ function tick(){
 	
 	try{flag} catch {
 		console.log("fenl_'s Bloxd Chip-8 emulator")
-		flag = "ON"
+		flag = "INIT"
     curr_tick = 0
     comm = 1
+		comms = 0
     init()
 	}
-	
 	switch (flag) {
 		case "RUNNING":
 			comm = ram[PC]
@@ -276,12 +276,21 @@ function tick(){
     	interpret(comm)
     	curr_tick++
     	if(comm == 0){
-     	 flag = "OFF"
-    	}
+				comms ++
+				if(comms > 30){
+     	 		flag = "OFF"
+				}
+    	} else {
+				comms = 0
+			}
 			break
 		case "INIT3":
 			init3()
 			flag = "RUNNING"
+			break
+		case "INIT2":
+			init2()
+			flag = "INIT3"
 			break
 		case "INIT":
 			flag = "INIT2"
