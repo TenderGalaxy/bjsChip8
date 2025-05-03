@@ -239,6 +239,7 @@ function interpret(line){
     case 7:
       api.log(`Add ${NN} to Register ${X} (Currently ${regs[X]})`)
       regs[X] = (regs[X] + NN)%255
+			api.log(`Now ${regs[x]}`)
       break
     case 8:
 			scw8(X,Y,N)
