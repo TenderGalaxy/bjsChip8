@@ -67,6 +67,9 @@ const rom = [
 ];
 
 
+
+
+
 toggleShiftEmu = false
 
 /* GOALS  */
@@ -124,11 +127,11 @@ function scw8(X,Y,N){
 			break
 		case 1:
 			api.log(`Set register ${X} (${regs[X]}) to register ${Y} (${regs[Y]}) Binary OR`)
-			regs[X] = regs[Y] || regs[X]
+			regs[X] = regs[Y] | regs[X]
 			break
 		case 2:
 			api.log(`Set register ${X} (${regs[X]}) to register ${Y} (${regs[Y]}) Binary AND`)
-			regs[X] = regs[Y] && regs[X]
+			regs[X] = regs[Y] & regs[X]
 			break
 		case 3:
 			api.log(`Set register ${X} (${regs[X]}) to register ${Y} (${regs[Y]}) Logical XOR`)
@@ -137,10 +140,11 @@ function scw8(X,Y,N){
 		case 4:
 			api.log(`Set register ${X} (${regs[X]}) to register ${Y} (${regs[Y]}) ADD`)
 			regs[X] = regs[Y] + regs[X]
-			regs[15] = 0 
 			if(regs[X] > 255){
 				regs[X] = regs[X] % 255
 				regs[15] = 1
+			} else {
+				regs[15] = 0
 			}
 			break
 		case 5:
@@ -205,8 +209,8 @@ function interpret(line){
 	  }
       break
     case 1:
-      api.log(`Jump to: ${NNN}`)
-      PC = NNN - 2
+      api.log(`Jump to: ${NNN.toString(16)}`)
+      PC = NNN
       break
     case 2:
 			api.log(`Entering Routine ${NNN} from ${PC}`)
@@ -234,13 +238,13 @@ function interpret(line){
       break
     case 7:
       api.log(`Add ${NN} to Register ${X} (Currently ${regs[X]})`)
-      regs[X] += NN
+      regs[X] = (regs[X] + NN)%255
       break
     case 8:
 			scw8(X,Y,N)
       break
     case 9:
-			if(regs[X] != regs[Y] & N == 0){
+			if(regs[X] != regs[Y]){
 				PC += 2
 			}
       break
@@ -309,6 +313,9 @@ function tick(){
     	PC++
     	interpret(comm)
     	curr_tick++
+		if(comm == NaN){
+		  flag = "OFF"
+		}
     	if(comm == 0){
 				comms ++
 				if(comms > 30){
